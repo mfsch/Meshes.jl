@@ -42,6 +42,8 @@ const Decagon    = Ngon{10}
 
 issimple(::Type{<:Ngon}) = true
 
+isconvex(p::Ngon{N,Dim,T}) where {N,Dim,T} = all(≤(T(π)), innerangles(p))
+
 hasholes(::Ngon) = false
 
 Base.unique!(ngon::Ngon) = ngon
@@ -53,7 +55,19 @@ chains(ngon::Ngon{N}) where {N} = [Chain(ngon.vertices[[1:N; 1]])]
 
 angles(ngon::Ngon) = angles(boundary(ngon))
 
-innerangles(ngon::Ngon) = innerangles(boundary(ngon))
+innerangles(ngon::Ngon{N,2}) where {N} = innerangles(boundary(ngon))
+
+function innerangles(ngon::Ngon{N,3,T}) where {N,T}
+  n = normal(ngon)
+  v = vertices(ngon)
+  Iterators.map(1:N) do ind
+    u1 = v[ind == 1 ? N : ind-1] - v[ind]
+    u2 = v[ind == N ? 1 : ind+1] - v[ind]
+    # compute signed angle based on normal vector
+    θ = atan((u1 × u2) · n, u1 ⋅ u2)
+    θ > 0 ? 2*T(π) - θ : -θ
+  end
+end
 
 signarea(ngon::Ngon) = sum(signarea, simplexify(ngon))
 
