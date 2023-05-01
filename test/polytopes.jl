@@ -259,6 +259,48 @@
     @test m[5] isa Triangle
   end
 
+  @testset "Prisms" begin
+    @test paramdim(Prism) == 3
+    @test nvertices(Prism{3}) == 6
+    @test nvertices(Prism{4}) == 8
+    @test nvertices(Prism{5}) == 10
+
+    p = Prism(P3[(0,0,0),(1,0,0),(0,1,0)],V3(0,0,1))
+    @test p == Prism(P3[(0,0,0),(1,0,0),(0,1,0)],T(1))
+    @test p == Prism(P3[(0,1,0),(1,0,0),(0,0,0)],V3(0,0,1))
+    @test isconvex(p)
+    @test volume(p) == T(1//2)
+    @test nvertices(p) == 6
+    @test vertices(p) == P3[(0,0,0),(1,0,0),(0,1,0),(0,0,1),(1,0,1),(0,1,1)]
+    @test (p -> @allocated vertices(p))(p) == 0
+    m = boundary(p)
+    @test m isa Mesh
+    @test nvertices(m) == 6
+    @test nelements(m) == 5
+    @test m[1] isa Triangle
+    @test m[2] isa Quadrangle
+    @test m[3] isa Quadrangle
+    @test m[4] isa Quadrangle
+    @test m[5] isa Triangle
+    n = normal.(m)
+    @test n[1] == T[0,0,-1]
+    @test n[2] == T[0,-1,0]
+    @test n[3] ≈ T[sqrt(2)/2,sqrt(2)/2,0]
+    @test n[4] == T[-1,0,0]
+    @test n[5] == T[0,0,1]
+
+    p = Prism(P3[(0,1,0),(1,1,0),(1,0,0),(2,2,0)],V3(1,1,1))
+    @test p == Prism(P3[(2,2,0),(1,0,0),(1,1,0),(0,1,0)],V3(1,1,1))
+    @test !isconvex(p)
+    @test (p -> @allocated isconvex(p))(p) == 0
+    @test nvertices(p) == 8
+    m = boundary(p)
+    @test m isa Mesh
+    @test nvertices(m) == 8
+    @test nelements(m) == 6
+    @test all(isa.(m, Quadrangle))
+  end
+
   @testset "Chains" begin
     # constructors
     c1 = Chain(P2[(1,1),(2,2),(1,1)])

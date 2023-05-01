@@ -159,6 +159,7 @@ export
   Octagon, Nonagon, Decagon,
   Chain, PolyArea,
   Tetrahedron, Pyramid, Hexahedron,
+  Prism,
   vertices, nvertices,
   windingnumber, chains, segments,
   isclosed, issimple, hasholes,
