@@ -174,6 +174,7 @@
     # Quadrangle in 3D space
     q = Quadrangle(P3(0,0,0), P3(1,0,0), P3(1,1,0), P3(0,1,0))
     @test area(q) == T(1)
+    @test normal(q) == V3(0,0,1)
     q = Quadrangle(P3(0,0,0), P3(1,0,0), P3(1,1,0), P3(0,1,1))
     @test area(q) > T(1)
     @test q(T(0),T(0)) == P3(0,0,0)

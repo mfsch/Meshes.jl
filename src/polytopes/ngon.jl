@@ -59,6 +59,29 @@ signarea(ngon::Ngon) = sum(signarea, simplexify(ngon))
 
 Base.in(p::Point, ngon::Ngon) = any(Δ -> p ∈ Δ, simplexify(ngon))
 
+"""
+    normal(ngon)
+
+Compute the normal vector of a polygon in three-dimensional space.
+The computation relies on Newell’s method as described in Sutherland et al. (1974).
+
+# References
+
+- Sutherland, I. E., Sproull, R. F., & Schumacker, R. A. (1974). A characterization of ten hidden-surface algorithms. *ACM Computing Surveys* 6(1), 1–55, [doi:10.1145/356625.356626](https://doi.org/10.1145/356625.356626).
+"""
+function normal(ngon::Ngon{N,3}) where {N}
+    v = vertices(ngon)
+    n = sum(1:N) do i
+        j = i == N ? 1 : i+1
+        x1, y1, z1 = coordinates(v[i])
+        x2, y2, z2 = coordinates(v[j])
+        Vec((y1-y2) * (z1+z2),
+            (z1-z2) * (x1+x2),
+            (x1-x2) * (y1+y2))
+    end
+    n / norm(n)
+end
+
 # ----------
 # TRIANGLES
 # ----------
